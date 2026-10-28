@@ -1,6 +1,6 @@
 # Antigravity Gemini 4 Argon & 3.8 Flash Tiered Thinking Routing Guide
 
-This document provides upstream maintainers and users with deep technical insight into integrating **Gemini 4 Argon** and **Gemini 3.8 Flash** via the Antigravity OAuth channel, resolving thinking-content stripping, and ensuring zero-disconnect production stability.
+This document provides upstream maintainers and users with deep technical insight into integrating **Gemini 4 Argon** and **Gemini 3.8 Flash** via the Antigravity OAuth channel, resolving thinking-content stripping, solving Cloudflare Error 524 timeouts, and ensuring zero-disconnect production stability.
 
 ---
 
@@ -79,16 +79,19 @@ oauth-model-alias:
 
 ---
 
-## 3. First-Write-Wins Rule Ordering for Tiered Budgets
+## 3. First-Write-Wins Rule Ordering & Flash Budget Decoupling
 
 In CLIProxyAPI, `payload.default` uses a **first-write-wins** matching strategy. If a generic or catch-all model rule precedes a specific sub-model rule, the specific rule will be shadowed and ignored.
 
-Therefore, the configuration must order specific tiers before general models:
+### Decoupling Daily Turnarounds vs Heavy Reasoning
+- **Daily Balanced Mode**: Bare `gemini-3.8-flash` (and aliases `gemini-3-flash`, `gemini-2.5-flash`) are assigned to the **4000** budget tier alongside `gemini-3.8-flash-medium`. This achieves fast **4~10s** responses while preserving complete chain-of-thought tokens.
+- **Heavy Reasoning Mode**: Users explicitly calling `gemini-3.8-flash-high` or `gemini-3.8-flash-tiered` receive the full **16000** deep-reasoning budget.
+- **Minimalist Mode**: `gemini-3.8-flash-low` provides an ultra-fast **1000** budget.
 
 ```yaml
 payload:
   default:
-    # 1. Low tier (16384 - reaches threshold)
+    # 1. Argon Low tier (16384 - reaches threshold)
     - models:
         - name: gemini-4-argon-low
           protocol: antigravity
@@ -96,7 +99,7 @@ payload:
         generationConfig.thinkingConfig.includeThoughts: true
         generationConfig.thinkingConfig.thinkingBudget: 16384
 
-    # 2. Medium tier (24576)
+    # 2. Argon Medium tier (24576)
     - models:
         - name: gemini-4-argon-medium
           protocol: antigravity
@@ -104,7 +107,7 @@ payload:
         generationConfig.thinkingConfig.includeThoughts: true
         generationConfig.thinkingConfig.thinkingBudget: 24576
 
-    # 3. High / Default tier (32768)
+    # 3. Argon High / Default tier (32768)
     - models:
         - name: gemini-4-argon-high
           protocol: antigravity
@@ -124,19 +127,23 @@ payload:
         generationConfig.thinkingConfig.includeThoughts: true
         generationConfig.thinkingConfig.thinkingBudget: 1000
 
-    # 5. Flash Medium (4000)
+    # 5. Flash Medium & Default Daily Bare Model (4000)
     - models:
         - name: gemini-3.8-flash-medium
+          protocol: antigravity
+        - name: gemini-3.8-flash
+          protocol: antigravity
+        - name: gemini-3-flash
+          protocol: antigravity
+        - name: gemini-2.5-flash
           protocol: antigravity
       params:
         generationConfig.thinkingConfig.includeThoughts: true
         generationConfig.thinkingConfig.thinkingBudget: 4000
 
-    # 6. Flash High / Default (16000)
+    # 6. Flash High / Tiered Heavy Reasoning (16000)
     - models:
         - name: gemini-3.8-flash-high
-          protocol: antigravity
-        - name: gemini-3.8-flash
           protocol: antigravity
         - name: gemini-3.8-flash-tiered
           protocol: antigravity
@@ -147,18 +154,36 @@ payload:
 
 ---
 
-## 4. Reverse Proxy & Keep-Alive Requirements
+## 4. Solving Cloudflare Error 524 & Production Zero-Disconnect
 
-Deep thinking models can ponder for $30 \sim 120$ seconds before streaming tokens. To prevent TCP connection drops, HTTP 499, and client `Connection error`:
+When deploying CLIProxyAPI behind Cloudflare CDN (Proxied / Orange Cloud mode), Cloudflare enforces a strict `origin_response_timeout = 120s`. If no response header or byte is transmitted within 120 seconds, Cloudflare returns `Error 524: A timeout occurred`.
 
-1. **CLIProxyAPI Keep-Alives**:
+### Why NOT disable Cloudflare Proxy (DNS Only)?
+Disabling Cloudflare's orange cloud exposes the origin server's real IP address. Because production VPS hosts frequently run proxy or administrative daemons, exposing origin IPs invites port scanning and targeted firewall throttling.
+
+### Native Solution Suite (Three Native Knives)
+
+1. **Pre-First-Token Keep-Alive (`streaming.send-keepalive-before-ft: true`)**:
+   Flushes HTTP 200 SSE headers immediately upon upstream connection and emits `: keep-alive\n\n` comments every 15s during the pre-TTFB reasoning window. Each flush resets Cloudflare's 120s timer.
    ```yaml
    streaming:
      keepalive-seconds: 15
      bootstrap-retries: 2
-   nonstream-keepalive-interval: 15
+     send-keepalive-before-ft: true
    ```
-2. **Nginx Reverse Proxy Directives**:
+
+2. **Connection Pool & Half-Open TCP Hygiene (`antigravity.connection-pool`)**:
+   Recycles idle connections after 20 seconds to prevent reusing dead half-open sockets silently discarded by Google Frontend (GFE) gateways:
+   ```yaml
+   tls-handshake-timeout-seconds: 15
+   antigravity:
+     connection-pool:
+       enabled: true
+       idle-conn-timeout: "20s"
+       max-idle-conns-per-host: 4
+   ```
+
+3. **Nginx Reverse Proxy Directives**:
    ```nginx
    proxy_http_version 1.1;
    proxy_set_header Connection "";
