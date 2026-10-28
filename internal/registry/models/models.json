@@ -4350,6 +4350,374 @@
       "native_capabilities": {
         "web_search": true
       }
+    },
+    {
+      "id": "gemini-4-argon",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 4 Argon",
+      "name": "gemini-4-argon",
+      "description": "Gemini 4 Argon",
+      "context_length": 1048576,
+      "max_completion_tokens": 1048576,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-4-argon-low",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 4 Argon (Low)",
+      "name": "gemini-4-argon-low",
+      "description": "Gemini 4 Argon (Low Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 1048576,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-4-argon-medium",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 4 Argon (Medium)",
+      "name": "gemini-4-argon-medium",
+      "description": "Gemini 4 Argon (Medium Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 1048576,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-4-argon-thinking",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 4 Argon (Thinking)",
+      "name": "gemini-4-argon-thinking",
+      "description": "Gemini 4 Argon (Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 1048576,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-3.8-flash",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 3.8 Flash",
+      "name": "gemini-3.8-flash",
+      "description": "Gemini 3.8 Flash",
+      "context_length": 1048576,
+      "max_completion_tokens": 65536,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-3.8-flash-low",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 3.8 Flash (Low)",
+      "name": "gemini-3.8-flash-low",
+      "description": "Gemini 3.8 Flash (Low Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 65536,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-3.8-flash-medium",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 3.8 Flash (Medium)",
+      "name": "gemini-3.8-flash-medium",
+      "description": "Gemini 3.8 Flash (Medium Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 65536,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "gemini-3.8-flash-tiered",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "supports_web_search": true,
+      "display_name": "Gemini 3.8 Flash (Tiered)",
+      "name": "gemini-3.8-flash-tiered",
+      "description": "Gemini 3.8 Flash (Tiered Thinking)",
+      "context_length": 1048576,
+      "max_completion_tokens": 65536,
+      "thinking": {
+        "min": 1,
+        "max": 65535,
+        "dynamic_allowed": true,
+        "levels": [
+          "low",
+          "medium",
+          "high"
+        ]
+      },
+      "supportedInputModalities": [
+        "text",
+        "image",
+        "audio",
+        "video"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ],
+      "native_capabilities": {
+        "web_search": true
+      }
+    },
+    {
+      "id": "claude-opus-4-6",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "display_name": "Claude Opus 4.6",
+      "name": "claude-opus-4-6",
+      "description": "Claude Opus 4.6",
+      "context_length": 200000,
+      "max_completion_tokens": 64000,
+      "thinking": {
+        "min": 1024,
+        "max": 64000,
+        "zero_allowed": true,
+        "dynamic_allowed": true
+      },
+      "supportedInputModalities": [
+        "text",
+        "image"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ]
+    },
+    {
+      "id": "claude-sonnet-4-6-thinking",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "display_name": "Claude Sonnet 4.6 (Thinking)",
+      "name": "claude-sonnet-4-6-thinking",
+      "description": "Claude Sonnet 4.6 (Thinking)",
+      "context_length": 200000,
+      "max_completion_tokens": 64000,
+      "thinking": {
+        "min": 1024,
+        "max": 64000,
+        "zero_allowed": true,
+        "dynamic_allowed": true
+      },
+      "supportedInputModalities": [
+        "text",
+        "image"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ]
+    },
+    {
+      "id": "claude-opus-5-5-medium",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "display_name": "Claude Opus 5.5 (Medium)",
+      "name": "claude-opus-5-5-medium",
+      "description": "Claude Opus 5.5 (Medium Thinking)",
+      "context_length": 1000000,
+      "max_completion_tokens": 128000,
+      "thinking": {
+        "min": 1024,
+        "max": 64000,
+        "zero_allowed": true,
+        "dynamic_allowed": true
+      },
+      "supportedInputModalities": [
+        "text",
+        "image"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ]
+    },
+    {
+      "id": "claude-sonnet-5-5-medium",
+      "object": "model",
+      "owned_by": "antigravity",
+      "type": "antigravity",
+      "display_name": "Claude Sonnet 5.5 (Medium)",
+      "name": "claude-sonnet-5-5-medium",
+      "description": "Claude Sonnet 5.5 (Medium Thinking)",
+      "context_length": 1000000,
+      "max_completion_tokens": 128000,
+      "thinking": {
+        "min": 1024,
+        "max": 64000,
+        "zero_allowed": true,
+        "dynamic_allowed": true
+      },
+      "supportedInputModalities": [
+        "text",
+        "image"
+      ],
+      "supportedOutputModalities": [
+        "text"
+      ]
     }
   ],
   "xai": [

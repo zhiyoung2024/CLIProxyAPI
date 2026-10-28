@@ -267,6 +267,53 @@ requests:
   # Optional payload configuration
   # payload:
   #   default: # Default rules only set parameters when they are missing in the payload.
+  #     # Antigravity Gemini 4 Argon & 3.8 Flash tiered thinking budget injection:
+  #     # Note: Place specific sub-models (-low / -medium) before bare/high models (first-write-wins).
+  #     # gemini-4-argon requires thinkingBudget >= 16384 on upstream v1internal to output thought contents.
+  #     - models:
+  #         - name: "gemini-4-argon-low"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 16384
+  #     - models:
+  #         - name: "gemini-4-argon-medium"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 24576
+  #     - models:
+  #         - name: "gemini-4-argon-high"
+  #           protocol: "antigravity"
+  #         - name: "gemini-4-argon"
+  #           protocol: "antigravity"
+  #         - name: "gemini-4-argon-thinking"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 32768
+  #     - models:
+  #         - name: "gemini-3.8-flash-low"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 1000
+  #     - models:
+  #         - name: "gemini-3.8-flash-medium"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 4000
+  #     - models:
+  #         - name: "gemini-3.8-flash-high"
+  #           protocol: "antigravity"
+  #         - name: "gemini-3.8-flash"
+  #           protocol: "antigravity"
+  #         - name: "gemini-3.8-flash-tiered"
+  #           protocol: "antigravity"
+  #       params:
+  #         "generationConfig.thinkingConfig.includeThoughts": true
+  #         "generationConfig.thinkingConfig.thinkingBudget": 16000
   #     - models:
   #         - name: "gemini-2.5-pro" # Supports wildcards (e.g., "gemini-*")
   #           protocol: "gemini" # restricts the rule to a specific protocol, options: openai, gemini, claude, codex, antigravity
@@ -984,6 +1031,22 @@ oauth:
   #     - name: "gemini-2.5-pro"
   #       alias: "g2.5p"
   #   antigravity:
+  #     # Reroute -low and -medium tiers to -high endpoint to bypass upstream thought stripping
+  #     - name: "gemini-4-argon-high"
+  #       alias: "gemini-4-argon"
+  #       fork: true
+  #     - name: "gemini-4-argon-high"
+  #       alias: "gemini-4-argon-low"
+  #       fork: true
+  #     - name: "gemini-4-argon-high"
+  #       alias: "gemini-4-argon-medium"
+  #       fork: true
+  #     - name: "gemini-3.8-flash-high"
+  #       alias: "gemini-3.8-flash"
+  #       fork: true
+  #     - name: "gemini-3.8-flash-high"
+  #       alias: "gemini-3.8-flash-low"
+  #       fork: true
   #     - name: "gemini-pro-agent"                   # upstream Antigravity model id
   #       alias: "gemini-3.1-pro-preview"            # client-visible id (Gemini 3.1 Pro Preview)
   #       display-name: "Antigravity Gemini 3.1 Pro" # optional catalog display name
