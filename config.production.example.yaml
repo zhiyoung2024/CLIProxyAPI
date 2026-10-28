@@ -1,0 +1,241 @@
+# ==============================================================================
+# CLIProxyAPI - Antigravity 专版高可用生产级配置示例 (config.production.example.yaml)
+# 特性：
+# 1. 深度整合 Antigravity 全量 35+ 模型目录 (models_catalog.json)
+# 2. 独创同名别名 (Alias) + 物理模型排除 (Excluded Models) 机制，完美激活 Google 隐藏思维链
+# 3. 严格分档思维预算注入 (payload.default first-write-wins 机制)
+# 4. SSE 流式心跳保活、双向防断流、配额熔断自动换项目与轮换策略
+# ==============================================================================
+
+# 服务监听地址与端口
+host: ""
+port: 8317
+
+# TLS 设置（通常推荐置于 Nginx 反代之后由 Nginx 终结 TLS，此处保持 false 即可）
+tls:
+  enable: false
+
+# 远程管理面板配置
+remote-management:
+  allow-remote: true
+  # 请使用 bcrypt 生成强哈希密码（例如通过 htpasswd 或在线 bcrypt 工具生成）
+  secret-key: "$2a$10$YOUR_BCRYPT_HASH_HERE"
+  # 生产环境强烈建议禁用面板自动升级，防止覆盖稳定版本或定制配置
+  disable-auto-update-panel: true
+
+# OAuth 认证凭据目录（存放 antigravity-*.json 凭据）
+auth-dir: "/root/.cli-proxy-api"
+
+# 客户端调用代理时的鉴权 API Key 列表
+api-keys:
+  - "sk-your-custom-api-key-1"
+  - "sk-your-custom-api-key-2"
+
+# 基础运行选项
+debug: false
+commercial-mode: false
+logging-to-file: true
+logs-max-total-size-mb: 200
+usage-statistics-enabled: false
+disable-cooling: false
+proxy-url: ""
+force-model-prefix: false
+
+# 请求失败重试机制（高并发防瞬时网络抖动）
+request-retry: 3
+max-retry-interval: 15
+
+# 配额与降级处理（当遇到 429 配额用尽时，自动切换到项目凭据或预览模型）
+quota-exceeded:
+  switch-project: true
+  switch-preview-model: true
+
+# 负载均衡路由策略
+routing:
+  strategy: round-robin
+  session-affinity: false
+
+redis-usage-queue-retention-seconds: 60
+ws-auth: false
+
+# ==============================================================================
+# 核心保活与防断流机制 (根除客户端 Error: Connection error / HTTP 499 / 读超时)
+# ==============================================================================
+# 非流式长请求心跳间隔（秒）
+nonstream-keepalive-interval: 15
+
+# 流式响应 SSE 心跳保活与重试策略
+streaming:
+  # 每 15 秒发送一次 SSE 保持注释行（: keep-alive\n\n），防止 Nginx / Cloudflare 默认 60s 超时切断长推理响应
+  keepalive-seconds: 15
+  # 首包传输前若网络抖动，自动重试拉取次数
+  bootstrap-retries: 2
+
+# 挂载外部全量模型目录（支持 Antigravity 35+ 模型定义及自定义能力标签）
+models:
+  catalog: "./models_catalog.json"
+
+# ==============================================================================
+# 关键思考预算注入 (payload.default - First-Write-Wins 规则)
+# 
+# 解决两大底层难点：
+# 1. gemini-4-argon-trial 上游规定：只有 thinkingBudget >= 16384 时，Google 后端才会回传 thought
+# 2. 配置顺序至关重要：CLIProxyAPI 的 payload.default 遵循先匹配原则 (First-Write-Wins)。
+#    必须将具体的子模型 (如 -low / -medium) 置于泛模型或 -high 规则之前，否则会被先匹配的默认值覆盖！
+# ==============================================================================
+payload:
+  default:
+    # 1) Gemini 4 Argon: 低档思考 (Low) -> 注入 16384 (达到触发思考的临界阈值)
+    - models:
+        - name: gemini-4-argon-low
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 16384
+
+    # 2) Gemini 4 Argon: 中档思考 (Medium) -> 注入 24576
+    - models:
+        - name: gemini-4-argon-medium
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 24576
+
+    # 3) Gemini 4 Argon: 高档/默认思考 (High / Bare / Thinking) -> 注入 32768 全满深度思考
+    - models:
+        - name: gemini-4-argon-high
+          protocol: antigravity
+        - name: gemini-4-argon
+          protocol: antigravity
+        - name: gemini-4-argon-thinking
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 32768
+
+    # 4) Gemini 3.8 Flash: 极速低档 (Low) -> 注入 1000
+    - models:
+        - name: gemini-3.8-flash-low
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 1000
+
+    # 5) Gemini 3.8 Flash: 中档思考 (Medium) -> 注入 4000
+    - models:
+        - name: gemini-3.8-flash-medium
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 4000
+
+    # 6) Gemini 3.8 Flash: 高档/全速思考 (High / Bare / Tiered) -> 注入 16000
+    - models:
+        - name: gemini-3.8-flash-high
+          protocol: antigravity
+        - name: gemini-3.8-flash
+          protocol: antigravity
+        - name: gemini-3.8-flash-tiered
+          protocol: antigravity
+      params:
+        generationConfig.thinkingConfig.includeThoughts: true
+        generationConfig.thinkingConfig.thinkingBudget: 16000
+
+# ==============================================================================
+# 物理模型排除与同名别名接管路由 (OAuth Excluded Models & Model Alias)
+#
+# 底层实测发现：
+# Google v1internal 上游在接收物理模型 gemini-4-argon-low / gemini-4-argon-medium / gemini-3.8-flash-low 请求时，
+# 无论客户端传什么 thinkingConfig，上游均强制剥离并屏蔽 thought 摘要回传！
+#
+# 核心解法：
+# 1. 在 oauth-excluded-models 中将原生物理模型屏蔽；
+# 2. 在 oauth-model-alias 中定义同名别名 (fork: true)，统一导向支持思考回传的物理端点 (-high)；
+# 3. 配合上文 payload.default，各档位请求在保持模型名称独立的同时，精确继承对应的思考预算并 100% 捕获思维链！
+# ==============================================================================
+oauth-excluded-models:
+  antigravity:
+    - gemini-4-argon-low
+    - gemini-4-argon-medium
+    - gemini-3.8-flash-low
+    # 屏蔽已弃用或不稳定的旧模型
+    - chat_20706
+    - chat_23310
+    - gemini-2.5-flash-lite
+    - gemini-2.5-pro
+    - gemini-2.5-flash
+
+oauth-model-alias:
+  antigravity:
+    # --- Gemini 4 Argon 家族别名重定向 ---
+    - alias: gemini-4-argon
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-4-argon-low
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-4-argon-medium
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-4-argon-thinking
+      fork: true
+      name: gemini-4-argon-high
+
+    # --- Gemini 3.8 Flash 家族别名重定向 ---
+    - alias: gemini-3.8-flash
+      fork: true
+      name: gemini-3.8-flash-high
+    - alias: gemini-3.8-flash-low
+      fork: true
+      name: gemini-3.8-flash-high
+    - alias: gemini-3.8-flash-tiered
+      fork: true
+      name: gemini-3.8-flash-high
+
+    # --- 旧版 Gemini 3.x / 2.5 自动平滑升级为新一代模型 ---
+    - alias: gemini-3.1-pro-high
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3.1-pro-low
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3.1-pro
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3-pro-high
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3-pro-low
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3-pro
+      fork: true
+      name: gemini-4-argon-high
+    - alias: gemini-3-flash
+      fork: true
+      name: gemini-3.8-flash-high
+    - alias: gemini-2.5-flash
+      fork: true
+      name: gemini-3.8-flash-high
+    - alias: gemini-2.5-flash-thinking
+      fork: true
+      name: gemini-3.8-flash-medium
+
+    # --- Claude 模型思考模式别名映射 ---
+    - alias: claude-opus-4-6
+      fork: true
+      name: claude-opus-4-6-thinking
+    - alias: claude-sonnet-4-6-thinking
+      fork: true
+      name: claude-sonnet-4-6
+
+# ==============================================================================
+# 第三方 OpenAI 兼容上游聚合配置示例（可选）
+# ==============================================================================
+openai-compatibility:
+  - name: groq
+    base-url: "https://api.groq.com/openai/v1"
+    api-key: "gsk_YOUR_GROQ_API_KEY_HERE"
+    models:
+      - name: llama-3.3-70b-versatile
+        alias: groq-llama-3.3-70b

@@ -1,6 +1,14 @@
-# CLI Proxy API
+# CLI Proxy API (Antigravity High-Availability Edition)
 
 English | [中文](README_CN.md) | [日本語](README_JA.md)
+
+> [!TIP]
+> **🚀 Antigravity Production Edition Highlights**:
+> - **Full Tiered Thinking Routing**: Full support for `gemini-4-argon` (low/medium/high/thinking) and `gemini-3.8-flash` (low/medium/high/tiered).
+> - **Thought Capture Hack**: Solves upstream `v1internal` thinking chain stripping via `oauth-excluded-models` + `oauth-model-alias` rerouting.
+> - **Strict Thinking Budget Staging**: Injects critical thresholds (Argon $\ge 16384$, Flash $1000-16000$) using first-write-wins priority rules.
+> - **Zero-Disconnect Enterprise Deployment**: SSE heartbeat (`streaming.keepalive-seconds: 15`), Nginx 600s proxy timeout, systemd service templates, and multi-credential model isolation.
+> - See [ANTIGRAVITY_OPTIMIZATION_GUIDE.md](ANTIGRAVITY_OPTIMIZATION_GUIDE.md) and [config.production.example.yaml](config.production.example.yaml) for full details!
 
 If you want to use CLIProxyAPI on your desktop, we recommend our [EasyCLIProxyAPI](https://github.com/router-for-me/EasyCLIProxyAPI) desktop client. It provides a graphical configuration UI, automatic updates, system tray integration, and one-click start/stop for the CLIProxyAPI service.
 

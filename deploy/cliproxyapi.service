@@ -1,0 +1,26 @@
+[Unit]
+Description=CLIProxyAPI Service (Antigravity High-Availability Proxy)
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/CLIProxyAPI
+Environment=HOME=/root
+# 启动命令：确保二进制文件具有可执行权限 (chmod +x /opt/CLIProxyAPI/cli-proxy-api)
+ExecStart=/opt/CLIProxyAPI/cli-proxy-api
+
+# 进程守护与自动拉起机制
+Restart=always
+RestartSec=5
+
+# 资源限制优化
+LimitNOFILE=65535
+LimitNPROC=65535
+
+# 日志输出配置
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

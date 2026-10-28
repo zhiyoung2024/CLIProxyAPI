@@ -1,0 +1,18 @@
+{
+  "_comment": "CLIProxyAPI Antigravity 渠道 OAuth 凭据配置示例（放置于 auth-dir 目录，如 /root/.cli-proxy-api/antigravity-user@example.com.json）",
+  "type": "antigravity",
+  "email": "user@example.com",
+  "project_id": "example-gcp-project-123456",
+  "access_token": "MOCK_OAUTH_ACCESS_TOKEN_PLACEHOLDER",
+  "refresh_token": "MOCK_OAUTH_REFRESH_TOKEN_PLACEHOLDER",
+  "expires_in": 3599,
+  "timestamp": 1740000000,
+  
+  "_doc_disabled": "健康治理特性 1：当账号在上游出现 403 VALIDATION_REQUIRED 或处于待验证风控状态时，设置 disabled: true 即可从负载均衡池中临时剔除，避免持续请求失败拖垮客户端重试。",
+  "disabled": false,
+
+  "_doc_attributes": "健康治理特性 2：单凭据模型级精准隔离。当该账号的 gemini-4-argon 高阶周配额耗尽但 gemini-3.8-flash 依然充裕时，无需整号停用，在此处配置 excluded_models 即可让该凭证仅承接 Flash 流量！",
+  "attributes": {
+    "excluded_models": "gemini-4-argon*,gemini-3.8-flash-low,chat_20706,chat_23310,gemini-2.5-flash-lite,gemini-2.5-pro,gemini-2.5-flash"
+  }
+}
